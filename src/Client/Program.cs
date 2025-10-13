@@ -26,12 +26,16 @@ SOFTWARE.
 
 #endregion License
 
+using Ananke.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Scalar.AspNetCore;
 using Serilog;
+
+const string APPLICATION_NAME = nameof(Ananke);
 
 // Setup bootstrap logger (https://nblumhardt.com/2020/10/bootstrap-logger/)
 Log.Logger = new LoggerConfiguration()
@@ -46,19 +50,34 @@ try
         loggerConfiguration
             .ReadFrom.Configuration(builder.Configuration)
             .ReadFrom.Services(services)
-            .Enrich.FromLogContext());
+            .Enrich.FromLogContext()); // https://github.com/serilog/serilog/wiki/Enrichment
 
     // DPAPI  
     builder.Services.AddDataProtection()
         .ProtectKeysWithDpapiNG();
 
+    // Scalar
+    builder.Services.AddOpenApi(options =>
+        options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
+    
     builder.WebHost.ConfigureKestrel(config =>
-        config.ListenLocalhost(5000));
+        config.ListenAnyIP(21200));
 
     var app = builder.Build();
 
     if (app.Environment.IsDevelopment())
     {
+        app.MapOpenApi();
+        app.MapScalarApiReference(options =>
+        {
+            options
+                .WithTitle(nameof(Ananke))
+                .WithTheme(ScalarTheme.DeepSpace)
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        });
+
+        Log.Information("Started Scalar service on: http://localhost:21200/scalar");
+
         app.UseSerilogRequestLogging(options =>
         {
             options.MessageTemplate =
@@ -73,10 +92,8 @@ try
     }
 
     app.UseHttpsRedirection();
-    
+
     app.UseRouting();
-    
-    app.UseAuthorization();
 
     await app.RunAsync();
 }
