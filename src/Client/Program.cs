@@ -26,7 +26,6 @@ SOFTWARE.
 
 #endregion License
 
-using Ananke.Middleware;
 using Ananke.Services;
 using Ananke.WindowsAPI;
 using Microsoft.AspNetCore.Builder;
@@ -59,8 +58,7 @@ try
         .ProtectKeysWithDpapiNG();
 
     // Scalar Middleware
-    builder.Services.AddOpenApi(options =>
-        options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
+    builder.Services.AddOpenApi();
     
     builder.WebHost.ConfigureKestrel(config =>
         config.ListenAnyIP(21200));
