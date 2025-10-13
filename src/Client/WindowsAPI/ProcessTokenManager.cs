@@ -36,10 +36,6 @@ public partial class ProcessTokenManager
     public static partial bool CloseHandle(
         IntPtr hObject);
 
-    private const string SE_SHUTDOWN_NAME = "SeShutdownPrivilege";
-    private const int SE_PRIVILEGE_ENABLED = 2;
-    private const int SE_PRIVILEGE_COUNT = 1;
-
     private readonly ILogger<ProcessTokenManager> _logger;
 
     public ProcessTokenManager(
@@ -48,15 +44,18 @@ public partial class ProcessTokenManager
         _logger = logger;
     }
 
-    public void EnableShutdownPrivilege()
+    public void EnableSpecialPrivilege(
+        string privilegeName = SEPrivileges.SE_SHUTDOWN_NAME,
+        int privilegeCount = SEPrivileges.SE_PRIVILEGE_COUNT,
+        uint privilegeAttributes = SEPrivileges.SE_PRIVILEGE_ENABLED)
     {
         TokenAttributes tokenAttributes;
-        tokenAttributes.PrivilegeCount = SE_PRIVILEGE_COUNT;
-        tokenAttributes.Privileges.Attributes = SE_PRIVILEGE_ENABLED;
+        tokenAttributes.PrivilegeCount = privilegeCount;
+        tokenAttributes.Privileges.Attributes = privilegeAttributes;
 
         if (!LookupPrivilegeValue(
                 lpSystemName: "",
-                lpName: SE_SHUTDOWN_NAME,
+                lpName: privilegeName,
                 lpLuid: out tokenAttributes.Privileges.Luid))
         {
             _logger.LogError(

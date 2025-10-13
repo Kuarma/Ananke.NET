@@ -27,7 +27,6 @@ SOFTWARE.
 #endregion License
 
 using Ananke.Middleware;
-using Ananke.WindowsAPI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
