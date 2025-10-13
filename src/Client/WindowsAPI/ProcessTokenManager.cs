@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Ananke.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Ananke.WindowsAPI;
 
-public partial class ProcessTokenManager
+[SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging")]
+public partial class ProcessTokenManager : IProcessTokenManager
 {
     [LibraryImport("advapi32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -23,7 +26,7 @@ public partial class ProcessTokenManager
         string lpSystemName,
         string lpName,
         out LUID lpLuid);
-    
+
     [LibraryImport("advapi32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool OpenProcessToken(
@@ -33,21 +36,24 @@ public partial class ProcessTokenManager
 
     [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool CloseHandle(
+    private static partial bool CloseHandle(
         IntPtr hObject);
 
     private readonly ILogger<ProcessTokenManager> _logger;
+    private readonly IntPtr _processToken;
 
     public ProcessTokenManager(
         ILogger<ProcessTokenManager> logger)
     {
         _logger = logger;
+        _processToken = GetProcessToken();
     }
 
-    public void EnableSpecialPrivilege(
+    public void SetProcessPrivilege(
         string privilegeName = SEPrivileges.SE_SHUTDOWN_NAME,
         int privilegeCount = SEPrivileges.SE_PRIVILEGE_COUNT,
-        uint privilegeAttributes = SEPrivileges.SE_PRIVILEGE_ENABLED)
+        uint privilegeAttributes = SEPrivileges.SE_PRIVILEGE_ENABLED,
+        bool disableAllPrivileges = false)
     {
         TokenAttributes tokenAttributes;
         tokenAttributes.PrivilegeCount = privilegeCount;
@@ -65,12 +71,26 @@ public partial class ProcessTokenManager
         }
 
         AdjustPrivileges(
-            disableAllPrivileges: false,
-            tokenHandle: GetProcessToken(),
+            disableAllPrivileges: disableAllPrivileges,
+            tokenHandle: _processToken,
             tokenAttributes: tokenAttributes);
     }
 
-    public void AdjustPrivileges(
+    public bool DisableHandle()
+    {
+        AdjustPrivileges(
+            disableAllPrivileges: true,
+            tokenHandle: _processToken);
+
+        if (CloseHandle(_processToken)) 
+            return true;
+        
+        _logger.LogError("Failed to close handle: {handle}",
+            _processToken);
+        return false;
+    }
+
+    private void AdjustPrivileges(
         bool disableAllPrivileges,
         IntPtr tokenHandle,
         TokenAttributes tokenAttributes = default)
@@ -86,14 +106,14 @@ public partial class ProcessTokenManager
                 tokenHandle);
     }
 
-    public IntPtr GetProcessToken()
+    private IntPtr GetProcessToken() 
     {
         if (OpenProcessToken(
                 processHandle: Process.GetCurrentProcess().Handle,
                 desiredAccess: Privileges.TokenAdjustPrivileges | Privileges.TokenQuery,
                 tokenHandle: out var tokenHandle))
             return tokenHandle;
-        
+
         _logger.LogError("Failed to get process token: {tokenHandle}",
             tokenHandle);
         throw new Win32Exception();

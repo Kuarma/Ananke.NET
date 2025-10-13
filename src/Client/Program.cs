@@ -27,6 +27,8 @@ SOFTWARE.
 #endregion License
 
 using Ananke.Middleware;
+using Ananke.Services;
+using Ananke.WindowsAPI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -52,17 +54,20 @@ try
             .ReadFrom.Services(services)
             .Enrich.FromLogContext()); // https://github.com/serilog/serilog/wiki/Enrichment
 
-    // DPAPI  
     builder.Services.AddDataProtection()
+        .SetApplicationName(APPLICATION_NAME)
         .ProtectKeysWithDpapiNG();
 
-    // Scalar
+    // Scalar Middleware
     builder.Services.AddOpenApi(options =>
         options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
     
     builder.WebHost.ConfigureKestrel(config =>
         config.ListenAnyIP(21200));
 
+    // Services
+    builder.Services.AddSingleton<IProcessTokenManager, ProcessTokenManager>();
+    
     var app = builder.Build();
 
     if (app.Environment.IsDevelopment())
@@ -71,7 +76,7 @@ try
         app.MapScalarApiReference(options =>
         {
             options
-                .WithTitle(nameof(Ananke))
+                .WithTitle(APPLICATION_NAME)
                 .WithTheme(ScalarTheme.DeepSpace)
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
         });
