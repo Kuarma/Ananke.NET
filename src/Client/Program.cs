@@ -57,7 +57,7 @@ try
         .SetApplicationName(APPLICATION_NAME)
         .ProtectKeysWithDpapiNG();
 
-    // Scalar Middleware
+    // Used for Scalar 
     builder.Services.AddOpenApi();
     
     builder.WebHost.ConfigureKestrel(config =>
