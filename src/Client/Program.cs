@@ -26,8 +26,8 @@ SOFTWARE.
 
 #endregion License
 
+using Ananke.Extensions;
 using Ananke.Services;
-using Ananke.WindowsAPI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -35,8 +35,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
 using Serilog;
+using ProcessTokenManager = Ananke.Services.WindowsAPI.ProcessTokenManager;
 
-const string APPLICATION_NAME = nameof(Ananke);
+const string APPLICATION_NAME = "Ananke";
 
 // Setup bootstrap logger (https://nblumhardt.com/2020/10/bootstrap-logger/)
 Log.Logger = new LoggerConfiguration()
@@ -61,10 +62,11 @@ try
     builder.Services.AddOpenApi();
     
     builder.WebHost.ConfigureKestrel(config =>
-        config.ListenAnyIP(21200));
+        config.ListenAnyIP(port: 21200));
 
     // Services
     builder.Services.AddSingleton<IProcessTokenManager, ProcessTokenManager>();
+    builder.Services.AddHostedService<DiscoveryService>();
     
     var app = builder.Build();
 

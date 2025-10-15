@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Ananke.WindowsAPI;
+namespace Ananke.Services.WindowsAPI;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct TokenAttributes
+public struct TokenPrivileges
 {
     public int PrivilegeCount;
     public LUIDAttributes Privileges;
@@ -12,7 +12,7 @@ public struct TokenAttributes
 [StructLayout(LayoutKind.Sequential)]
 public struct LUIDAttributes
 {
-    public LUID Luid;
+    public LUID LUID;
     public uint Attributes;
 }
 
