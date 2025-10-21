@@ -2,6 +2,7 @@
 
 namespace Ananke.Services.WindowsAPI;
 
+// https://essentialcsharp.com/using-safehandle
 public sealed partial class SafeMemoryHandle : SafeHandle
 {
     [LibraryImport("kernel32.dll", SetLastError = true)]

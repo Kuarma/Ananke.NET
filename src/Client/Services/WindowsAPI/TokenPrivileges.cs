@@ -5,7 +5,7 @@ namespace Ananke.Services.WindowsAPI;
 [StructLayout(LayoutKind.Sequential)]
 public struct TokenPrivileges
 {
-    public int PrivilegeCount;
+    public uint PrivilegeCount;
     public LUIDAttributes Privileges;
 }
 

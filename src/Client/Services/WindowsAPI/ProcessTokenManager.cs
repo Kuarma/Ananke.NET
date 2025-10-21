@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Ananke.Services.WindowsAPI;
 
+// https://github.com/dotnet/roslyn-analyzers/issues/7690
 [SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging")]
 public partial class ProcessTokenManager : IProcessTokenManager
 {
@@ -53,7 +54,7 @@ public partial class ProcessTokenManager : IProcessTokenManager
 
     public bool TrySetProcessPrivilege(
         string privilegeName = SEPrivileges.SE_SHUTDOWN_NAME,
-        int privilegeCount = SEPrivileges.SE_PRIVILEGE_COUNT,
+        uint privilegeCount = SEPrivileges.SE_PRIVILEGE_COUNT,
         uint privilegeAttributes = SEPrivileges.SE_PRIVILEGE_ENABLED)
     {
         var tokenPrivileges = new TokenPrivileges

@@ -27,7 +27,7 @@ SOFTWARE.
 #endregion License
 
 using Ananke.Extensions;
-using Ananke.Services;
+using Ananke.Services.WindowsAPI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +35,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
 using Serilog;
-using ProcessTokenManager = Ananke.Services.WindowsAPI.ProcessTokenManager;
 
 const string APPLICATION_NAME = "Ananke";
 
