@@ -28,6 +28,7 @@ SOFTWARE.
 
 using Ananke.Extensions;
 using Ananke.Services.WindowsAPI;
+using Ananke.Services.WindowsAPI.Dns;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;

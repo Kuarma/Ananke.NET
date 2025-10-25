@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Ananke.Services.WindowsAPI;
+namespace Ananke.Services.WindowsAPI.Handles;
 
 // https://essentialcsharp.com/using-safehandle
 public sealed partial class SafeMemoryHandle : SafeHandle
@@ -17,8 +17,8 @@ public sealed partial class SafeMemoryHandle : SafeHandle
     {
     }
 
-    public override bool IsInvalid => handle == IntPtr.Zero ||
-                                      handle == new IntPtr(-1);
+    public override bool IsInvalid =>
+        handle == IntPtr.Zero; 
 
     protected override bool ReleaseHandle()
     {

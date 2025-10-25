@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Ananke.Extensions;
+using Ananke.Services.WindowsAPI.Handles;
 using Microsoft.Extensions.Logging;
 
 namespace Ananke.Services.WindowsAPI;
@@ -15,7 +16,7 @@ public partial class ProcessTokenManager : IProcessTokenManager
     private static partial bool AdjustTokenPrivileges(
         SafeMemoryHandle safeMemoryHandle,
         [MarshalAs(UnmanagedType.Bool)] bool disableAllPrivileges,
-        ref TokenPrivileges newState,
+        ref TOKEN_PRIVILEGES newState,
         uint bufferLength,
         IntPtr previousState,
         IntPtr returnLength);
@@ -57,10 +58,10 @@ public partial class ProcessTokenManager : IProcessTokenManager
         uint privilegeCount = SEPrivileges.SE_PRIVILEGE_COUNT,
         uint privilegeAttributes = SEPrivileges.SE_PRIVILEGE_ENABLED)
     {
-        var tokenPrivileges = new TokenPrivileges
+        var tokenPrivileges = new TOKEN_PRIVILEGES
         {
             PrivilegeCount = privilegeCount,
-            Privileges = new LUIDAttributes
+            Privileges = new LUID_ATTRIBUTES
             {
                 Attributes = privilegeAttributes
             }
@@ -94,7 +95,7 @@ public partial class ProcessTokenManager : IProcessTokenManager
     
     public bool TryDisableHandle()
     {
-        TokenPrivileges tokenPrivileges = default;
+        TOKEN_PRIVILEGES tokenPrivileges = default;
 
         if (!AdjustTokenPrivileges(
                 safeMemoryHandle: _safeMemoryHandle,
