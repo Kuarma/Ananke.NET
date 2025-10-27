@@ -2,12 +2,6 @@
 
 namespace Ananke.Services.WindowsAPI.Dns;
 
-[UnmanagedFunctionPointer(CallingConvention.Winapi)]
-public delegate void DnsServiceRegisterComplete(
-    uint status,
-    IntPtr pQueryContext,
-    IntPtr pInstanceName);
-
 [StructLayout(LayoutKind.Sequential)]
 public struct PDNS_SERVICE_REGISTER_REQUEST
 {

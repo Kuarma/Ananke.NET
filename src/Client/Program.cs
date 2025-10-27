@@ -60,7 +60,7 @@ try
         .ProtectKeysWithDpapiNG();
     
     builder.Services.AddOptions<DiscoveryStartupOption>()
-        .Bind(builder.Configuration.GetSection(DiscoveryStartupOption.SectionName))
+        .Bind(builder.Configuration.GetSection(DiscoveryStartupOption.SECTION_NAME))
         .ValidateDataAnnotations()
         .ValidateOnStart();
 

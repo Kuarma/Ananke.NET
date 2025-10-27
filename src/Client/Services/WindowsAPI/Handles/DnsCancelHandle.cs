@@ -27,12 +27,6 @@ public partial class DnsCancelHandle : SafeHandle
 
         var errorCode = DnsServiceRegisterCancel(handle);
 
-        if (errorCode != 0)
-            Log.Error(
-                "Failed to cancel DNS service. Error code: {ErrorCode} " +
-                "Check the docs: https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-",
-                errorCode);
-
         try
         {
             Marshal.FreeHGlobal(handle);
@@ -46,6 +40,13 @@ public partial class DnsCancelHandle : SafeHandle
             handle = IntPtr.Zero; // Ensure the handle is set to null to prevent double free.
         }
 
-        return errorCode == 0;
+        if (errorCode == (int)WindowsErrorCodes.ERROR_SUCCESS) 
+            return true;
+        
+        Log.Error(
+            "Failed to cancel DNS service. Error code: {ErrorCode}",
+            errorCode);
+        
+        return false;
     }
 }
