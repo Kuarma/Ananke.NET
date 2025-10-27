@@ -32,6 +32,7 @@ using Ananke.Services.WindowsAPI.Dns;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
@@ -57,17 +58,22 @@ try
     builder.Services.AddDataProtection()
         .SetApplicationName(APPLICATION_NAME)
         .ProtectKeysWithDpapiNG();
+    
+    builder.Services.AddOptions<DiscoveryStartupOption>()
+        .Bind(builder.Configuration.GetSection(DiscoveryStartupOption.SectionName))
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
     // Used for Scalar 
     builder.Services.AddOpenApi();
-    
+
     builder.WebHost.ConfigureKestrel(config =>
         config.ListenAnyIP(port: 21200));
 
     // Services
     builder.Services.AddSingleton<IProcessTokenManager, ProcessTokenManager>();
-    builder.Services.AddHostedService<DiscoveryService>();
-    
+    builder.Services.AddTransient<IDiscoveryService, DiscoveryService>();
+
     var app = builder.Build();
 
     if (app.Environment.IsDevelopment())

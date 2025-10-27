@@ -35,9 +35,3 @@ public struct PDNS_SERVICE_INSTANCE
     public IntPtr values;
     public uint dwInterfaceIndex;
 }
-
-[StructLayout(LayoutKind.Sequential)]
-public struct PDNS_SERVICE_CANCEL
-{
-    public IntPtr reserved;
-}
