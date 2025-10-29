@@ -1,9 +1,10 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Ananke.Services.WindowsAPI.Handles;
 
 // https://essentialcsharp.com/using-safehandle
-public sealed partial class SafeMemoryHandle : SafeHandle
+public sealed partial class SafeMemoryHandle : SafeHandleZeroOrMinusOneIsInvalid
 {
     [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -12,13 +13,9 @@ public sealed partial class SafeMemoryHandle : SafeHandle
 
     public SafeMemoryHandle() :
         base(
-            invalidHandleValue: IntPtr.Zero,
             ownsHandle: true)
     {
     }
-
-    public override bool IsInvalid =>
-        handle == IntPtr.Zero; 
 
     protected override bool ReleaseHandle()
     {

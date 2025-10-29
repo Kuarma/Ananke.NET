@@ -1,7 +1,7 @@
 ﻿namespace Ananke.Services.WindowsAPI;
 
 // https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-"
-public enum WindowsErrorCodes 
+public enum WinSpecialCodes 
 {
     // Success codes
     ERROR_SUCCESS = 0,
@@ -9,5 +9,5 @@ public enum WindowsErrorCodes
     ERROR_CANCELLED = 1223,
     
     // Error codes
-    ERROR_INVALID_PARAMETER = 87,
+    ERROR_INVALID_PARAMETER = 87
 }

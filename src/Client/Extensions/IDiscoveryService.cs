@@ -2,5 +2,6 @@
 
 public interface IDiscoveryService
 {
-    
+    void StartServiceDiscovery();
+    void StopServiceDiscovery();
 }
